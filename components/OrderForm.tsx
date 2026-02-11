@@ -18,11 +18,10 @@ const OrderForm: React.FC<OrderFormProps> = ({ user, product, onLoginRequest, on
     contactName: '',
     contactPhone: '',
     depositorName: '',
-    address: '현장수령' // Default for this event
+    address: '현장수령' 
   });
 
   const progress = Math.min((product.currentAmount / product.goalAmount) * 100, 100);
-  // Calculate remaining days roughly
   const today = new Date();
   const endDate = new Date(product.endDate);
   const diffTime = Math.abs(endDate.getTime() - today.getTime());
@@ -30,7 +29,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ user, product, onLoginRequest, on
 
   const handleRewardClick = (reward: Reward) => {
     if (!user) {
-      if(confirm('로그인이 필요한 서비스입니다. 로그인 하시겠습니까?')) {
+      if(confirm('로그인이 필요한 서비스입니다. 구글 로그인 하시겠습니까?')) {
         onLoginRequest();
       }
       return;
@@ -56,7 +55,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ user, product, onLoginRequest, on
       rewardTitle: selectedReward.title,
       totalAmount: selectedReward.price,
       ...formData,
-      quantity: 1 // Default to 1 for this event logic
+      quantity: 1 
     };
 
     const success = await createOrder(orderPayload);
@@ -73,135 +72,151 @@ const OrderForm: React.FC<OrderFormProps> = ({ user, product, onLoginRequest, on
   };
 
   return (
-    <div className="hidden lg:block w-[360px] flex-shrink-0">
-      <div className="sticky top-24 space-y-8">
+    <div className="hidden lg:block w-[340px] flex-shrink-0 relative">
+      <div className="sticky top-20 space-y-6">
         
-        {/* Project Meta Info */}
-        <div className="space-y-4">
-          <div className="text-sm font-medium text-slate-500 mb-1">문화·출판</div>
-          <h2 className="text-2xl font-bold text-slate-900 leading-snug break-keep">
+        {/* TOP SECTION: Funding Status (Fixed feeling) */}
+        <div className="bg-white">
+          <div className="text-[13px] text-slate-500 font-bold mb-3 tracking-tight">
+             {product.category}
+          </div>
+          
+          <h2 className="text-[24px] font-bold text-slate-900 leading-snug break-keep tracking-tight mb-6">
             {product.title}
           </h2>
 
-          <div className="space-y-1">
-             <div className="text-sm text-slate-500">모인 금액</div>
-             <div className="flex items-baseline gap-2">
-               <span className="text-3xl font-bold text-slate-900">{product.currentAmount.toLocaleString()}</span>
-               <span className="text-xl font-normal text-slate-900">원</span>
-               <span className="text-2xl font-bold text-teal-500 ml-auto">{progress}%</span>
+          <div className="space-y-4 mb-6">
+             <div>
+               <div className="text-[13px] text-slate-500 mb-1">모인 금액</div>
+               <div className="flex items-baseline gap-1">
+                 <span className="text-[30px] font-bold text-slate-900 font-['Roboto']">{product.currentAmount.toLocaleString()}</span>
+                 <span className="text-[16px] font-normal text-slate-900">원</span>
+               </div>
+             </div>
+             
+             <div className="flex items-center justify-between">
+                <div className="text-[14px] text-slate-500">
+                  <span className="text-[#00c7ae] font-bold text-[18px] mr-1">{progress}%</span> 달성
+                </div>
+                <div className="text-[14px] text-slate-500">
+                  <span className="font-bold text-slate-900">{product.supporterCount}명</span> 후원
+                </div>
              </div>
           </div>
 
-          <div className="text-sm text-slate-500 flex items-center gap-1">
-             <span className="font-bold text-slate-900">{product.supporterCount}명</span>이 후원했어요
+          <hr className="border-slate-100 mb-5"/>
+
+          {/* Info Rows */}
+          <div className="space-y-3 text-[13px] mb-6">
+             <div className="flex">
+               <span className="w-20 text-slate-400 font-medium">목표 금액</span>
+               <span className="text-slate-800 font-medium">{product.goalAmount.toLocaleString()}원</span>
+             </div>
+             <div className="flex">
+               <span className="w-20 text-slate-400 font-medium">펀딩 기간</span>
+               <div className="flex flex-col">
+                 <span className="text-slate-800 font-medium">{product.startDate.replaceAll('-','.')} ~ {product.endDate.replaceAll('-','.')}</span>
+                 <span className="text-[#ff6b6b] bg-[#fff0f0] px-1.5 py-0.5 rounded w-fit mt-1 font-bold text-[11px]">{diffDays}일 남음</span>
+               </div>
+             </div>
+             <div className="flex">
+               <span className="w-20 text-slate-400 font-medium">결제 시점</span>
+               <span className="text-slate-800 font-medium">후원 시 즉시 결제</span>
+             </div>
           </div>
 
-          <div className="bg-slate-50 rounded-lg p-4 space-y-2 text-sm border border-slate-100">
-             <div className="flex">
-               <span className="w-20 text-slate-500 font-medium">목표 금액</span>
-               <span className="text-slate-900">{product.goalAmount.toLocaleString()}원</span>
-             </div>
-             <div className="flex">
-               <span className="w-20 text-slate-500 font-medium">펀딩 기간</span>
-               <span className="text-slate-900">{product.startDate} ~ {product.endDate} <span className="text-red-400 text-xs bg-red-50 px-1 py-0.5 rounded ml-1">{diffDays}일 남음</span></span>
-             </div>
-             <div className="flex">
-               <span className="w-20 text-slate-500 font-medium">결제 시점</span>
-               <span className="text-slate-900">후원 시 즉시 결제</span>
-             </div>
-          </div>
-
-          <div className="flex gap-3">
-             <button className="flex-1 border border-slate-200 rounded-lg py-3 flex items-center justify-center gap-1 hover:bg-slate-50 transition-colors">
-                <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
-                <span className="text-sm text-slate-600">0</span>
+          {/* Buttons */}
+          <div className="flex gap-2.5 h-12 mb-8">
+             <button className="w-12 h-full border border-slate-200 rounded flex flex-col items-center justify-center gap-0.5 hover:border-slate-300 transition-colors">
+                <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                <span className="text-[10px] text-slate-500">0</span>
              </button>
-             <button className="flex-[3] bg-teal-50 text-teal-600 font-bold rounded-lg py-3 hover:bg-teal-100 transition-colors">
+             <button 
+                className="flex-1 bg-[#e0f7f4] text-[#00c7ae] text-[16px] font-bold rounded hover:bg-[#00c7ae] hover:text-white transition-all"
+                onClick={() => document.getElementById('reward-section')?.scrollIntoView({ behavior: 'smooth' })}
+             >
                후원하기
              </button>
-             <button className="flex-1 border border-slate-200 rounded-lg py-3 flex items-center justify-center hover:bg-slate-50 transition-colors">
-               <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+             <button className="w-12 h-full border border-slate-200 rounded flex flex-col items-center justify-center gap-0.5 hover:border-slate-300 transition-colors">
+               <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
              </button>
           </div>
         </div>
 
-        {/* Reward List */}
-        <div className="space-y-4">
-          {product.rewards.map((reward) => (
-            <div 
-              key={reward.id}
-              onClick={() => handleRewardClick(reward)}
-              className={`border rounded-xl p-5 cursor-pointer transition-all hover:shadow-md ${selectedReward?.id === reward.id ? 'border-teal-500 ring-1 ring-teal-500 bg-teal-50/20' : 'border-slate-200 bg-white'}`}
-            >
-              <div className="flex justify-between items-start mb-2">
-                 <div className="flex items-center gap-1 text-teal-500 text-sm font-medium">
-                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                   0명 후원
-                 </div>
-              </div>
-              
-              <div className="flex justify-between items-center mb-4">
-                 <span className="text-xl font-bold text-slate-900">{reward.price.toLocaleString()}원+</span>
-                 <span className="text-xs bg-red-50 text-red-500 px-1.5 py-0.5 rounded font-medium">{reward.remaining}개 남음</span>
-              </div>
-              
-              <p className="text-slate-600 text-sm mb-4">{reward.description}</p>
-              
-              <div className="space-y-1">
-                 <p className="text-xs font-bold text-slate-500">리워드 구성</p>
-                 <ul className="text-xs text-slate-500 list-disc list-inside">
+        {/* BOTTOM SECTION: Rewards (Scrollable/Separated) */}
+        <div id="reward-section" className="border-t border-slate-200 pt-6">
+          <h3 className="font-bold text-slate-900 text-[16px] mb-4">리워드 선택</h3>
+          <div className="space-y-3 max-h-[calc(100vh-500px)] overflow-y-auto pr-1 custom-scrollbar">
+            {product.rewards.map((reward) => (
+              <div 
+                key={reward.id}
+                onClick={() => handleRewardClick(reward)}
+                className={`border rounded-lg p-5 cursor-pointer transition-all hover:border-[#00c7ae] bg-white group ${selectedReward?.id === reward.id ? 'border-[#00c7ae] ring-1 ring-[#00c7ae]' : 'border-slate-200'}`}
+              >
+                <div className="flex justify-between items-center mb-1">
+                   <div className="flex items-center gap-1 text-[#00c7ae] text-[12px] font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                     선택하기
+                   </div>
+                   <span className="text-[11px] text-slate-400">0명 선택</span>
+                </div>
+                
+                <div className="flex justify-between items-baseline mb-3">
+                   <span className="text-[18px] font-bold text-slate-900 tracking-tight">{reward.price.toLocaleString()}원 +</span>
+                </div>
+                
+                <p className="text-slate-600 text-[14px] mb-4 leading-snug">{reward.description}</p>
+                
+                <ul className="text-[12px] text-slate-500 list-disc list-inside space-y-0.5 border-t border-dashed border-slate-100 pt-3">
                    {reward.items.map((item, idx) => (
                      <li key={idx}>{item}</li>
                    ))}
-                 </ul>
-              </div>
+                </ul>
 
-              {selectedReward?.id === reward.id && (
-                <div className="mt-6 pt-6 border-t border-slate-200 animate-in fade-in slide-in-from-top-2">
-                  <h4 className="font-bold text-sm text-slate-800 mb-3">후원 정보 입력</h4>
-                  <div className="space-y-3">
-                    <input 
-                      type="text" 
-                      name="contactName" 
-                      placeholder="후원자 성함 (실명)"
-                      value={formData.contactName}
-                      onChange={handleChange}
-                      onClick={(e) => e.stopPropagation()}
-                      className="w-full px-3 py-2 border border-slate-300 rounded text-sm focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none"
-                    />
-                    <input 
-                      type="text" 
-                      name="contactPhone" 
-                      placeholder="연락처"
-                      value={formData.contactPhone}
-                      onChange={handleChange}
-                      onClick={(e) => e.stopPropagation()}
-                      className="w-full px-3 py-2 border border-slate-300 rounded text-sm focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none"
-                    />
-                    <input 
-                      type="text" 
-                      name="depositorName" 
-                      placeholder="입금자명 (닉네임)"
-                      value={formData.depositorName}
-                      onChange={handleChange}
-                      onClick={(e) => e.stopPropagation()}
-                      className="w-full px-3 py-2 border border-slate-300 rounded text-sm focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none"
-                    />
-                    <div className="text-xs text-slate-400 px-1">
-                      * 현장 수령 상품입니다. (배송지 입력 불필요)
+                {selectedReward?.id === reward.id && (
+                  <div className="mt-4 pt-4 border-t border-slate-100 animate-in fade-in zoom-in-95 duration-200">
+                    <div className="space-y-2">
+                      <input 
+                        type="text" 
+                        name="contactName" 
+                        placeholder="성함 (실명)"
+                        value={formData.contactName}
+                        onChange={handleChange}
+                        onClick={(e) => e.stopPropagation()}
+                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded text-[13px] focus:border-[#00c7ae] focus:ring-1 focus:ring-[#00c7ae] outline-none"
+                      />
+                      <input 
+                        type="text" 
+                        name="contactPhone" 
+                        placeholder="연락처 (- 없이)"
+                        value={formData.contactPhone}
+                        onChange={handleChange}
+                        onClick={(e) => e.stopPropagation()}
+                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded text-[13px] focus:border-[#00c7ae] focus:ring-1 focus:ring-[#00c7ae] outline-none"
+                      />
+                      <input 
+                        type="text" 
+                        name="depositorName" 
+                        placeholder="입금자명 (닉네임)"
+                        value={formData.depositorName}
+                        onChange={handleChange}
+                        onClick={(e) => e.stopPropagation()}
+                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded text-[13px] focus:border-[#00c7ae] focus:ring-1 focus:ring-[#00c7ae] outline-none"
+                      />
+                      
+                      <button 
+                        onClick={handleSubmit}
+                        disabled={loading}
+                        className="w-full bg-[#00c7ae] text-white font-bold py-3 rounded hover:bg-[#00b29b] transition-colors mt-2 text-[14px]"
+                      >
+                        {loading ? '...' : '밀어주기'}
+                      </button>
                     </div>
-                    <button 
-                      onClick={handleSubmit}
-                      disabled={loading}
-                      className="w-full bg-teal-500 text-white font-bold py-3 rounded-lg hover:bg-teal-600 transition-colors disabled:opacity-50"
-                    >
-                      {loading ? '처리 중...' : `${reward.price.toLocaleString()}원 후원하기`}
-                    </button>
                   </div>
-                </div>
-              )}
-            </div>
-          ))}
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

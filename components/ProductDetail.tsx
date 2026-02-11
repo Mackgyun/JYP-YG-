@@ -7,88 +7,100 @@ interface ProductDetailProps {
 
 const ProductDetail: React.FC<ProductDetailProps> = ({ product }) => {
   return (
-    <div className="w-full lg:w-[730px]">
-      {/* Title Header - Mobile Only (Hidden on Desktop per layout req, but keeping accessible) */}
-      <div className="lg:hidden mb-6">
-        <span className="text-teal-500 font-bold text-sm mb-2 inline-block">문화·출판</span>
-        <h1 className="text-2xl font-bold text-slate-900 leading-tight mb-4">{product.title}</h1>
-      </div>
-
-      {/* Main Image */}
-      <div className="w-full rounded-xl overflow-hidden bg-slate-100 mb-10 shadow-sm border border-slate-100">
-        <div className="aspect-[4/3] w-full relative group">
+    <div className="w-full lg:w-[700px]">
+      {/* Main Image - Slightly smaller container as requested */}
+      <div className="w-full rounded-xl overflow-hidden bg-slate-100 mb-8 shadow-sm border border-slate-100">
+        <div className="aspect-[16/10] w-full relative">
            <img 
             src={product.images[0]} 
             alt="Main Visual" 
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            className="w-full h-full object-cover"
           />
         </div>
       </div>
 
       {/* Tab Navigation */}
-      <div className="sticky top-16 sm:top-20 z-10 bg-white border-b border-slate-200 mb-8">
-        <div className="flex gap-8">
-          <button className="py-4 border-b-[3px] border-teal-500 font-bold text-teal-600">프로젝트 소개</button>
-          <button className="py-4 border-b-[3px] border-transparent text-slate-500 hover:text-slate-800 font-medium transition-colors">커뮤니티</button>
-          <button className="py-4 border-b-[3px] border-transparent text-slate-500 hover:text-slate-800 font-medium transition-colors">후원자</button>
+      <div className="sticky top-16 z-20 bg-white border-b border-slate-200 mb-10">
+        <div className="flex gap-6">
+          <button className="py-3 border-b-2 border-[#00c7ae] font-bold text-[#00c7ae] text-[15px]">프로젝트 소개</button>
+          <button className="py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-medium transition-colors text-[15px]">커뮤니티</button>
+          <button className="py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-medium transition-colors text-[15px]">후원자</button>
         </div>
       </div>
 
       {/* Content */}
-      <div className="pb-12">
-        {/* Intro Header Styled */}
-        <div className="mb-10 border-b border-slate-100 pb-10">
-          <h2 className="text-3xl font-bold text-slate-900 mb-2 border-b-2 border-slate-900 inline-block pb-1">
-            &lt;YG와 JYP의 책걸상&gt;<br/>
-            토크콘서트 2026
-          </h2>
-        </div>
-
-        {/* Dynamic Markdown-like Parsing */}
-        <div className="prose prose-lg prose-slate max-w-none prose-headings:font-bold prose-headings:text-slate-900 prose-p:text-slate-600 prose-strong:text-slate-900">
+      <div className="pb-12 text-slate-800">
+        {/* Dynamic Parsing */}
+        <div className="space-y-4">
           {product.description.split('\n').map((line, i) => {
-             if (line.startsWith('**') && line.endsWith('**')) {
-               return <h3 key={i} className="text-xl mt-8 mb-4">{line.replace(/\*\*/g, '')}</h3>;
+             const trimmed = line.trim();
+             
+             // 1. Headers
+             if (trimmed.startsWith('###')) {
+               return <h3 key={i} className="text-[22px] font-bold text-slate-900 mt-10 mb-4 tracking-tight border-l-4 border-[#00c7ae] pl-3">{trimmed.replace('###', '').trim()}</h3>;
              }
-             if (line.startsWith('---')) {
-               return <hr key={i} className="my-8 border-slate-200" />;
+             
+             // 2. Bold text (simulated markdown)
+             if (trimmed.startsWith('**') && trimmed.endsWith('**')) {
+               return <p key={i} className="text-[17px] font-bold text-slate-900 mt-6 mb-2 tracking-tight">{trimmed.replace(/\*\*/g, '')}</p>;
              }
-             if (line.trim() === '') {
-               return <br key={i} />;
+
+             // 3. Images (Large)
+             if (trimmed.startsWith('IMAGE:')) {
+               return (
+                 <div key={i} className="my-6 rounded-lg overflow-hidden border border-slate-100">
+                   <img src={trimmed.replace('IMAGE:', '').trim()} alt="Content" className="w-full h-auto block" />
+                 </div>
+               );
              }
-             return <p key={i} className="my-2 leading-relaxed text-[16px]">{line}</p>;
+
+             // 4. Images (Small - Profile style)
+             if (trimmed.startsWith('IMAGE_S:')) {
+               return (
+                 <div key={i} className="my-4 w-32 h-32 rounded-full overflow-hidden border border-slate-200 shadow-sm">
+                   <img src={trimmed.replace('IMAGE_S:', '').trim()} alt="Profile" className="w-full h-full object-cover" />
+                 </div>
+               );
+             }
+
+             // 5. Captions / Notes
+             if (trimmed.startsWith('CAPTION:') || trimmed.startsWith('* ')) {
+               return <p key={i} className="text-[13px] text-slate-500 mt-1 mb-4 leading-normal pl-1">{trimmed.replace('CAPTION:', '')}</p>;
+             }
+
+             // 6. Horizontal Rule
+             if (trimmed.startsWith('---')) {
+               return <hr key={i} className="my-10 border-slate-100" />;
+             }
+
+             // 7. Empty lines
+             if (trimmed === '') {
+               return <div key={i} className="h-2"></div>;
+             }
+
+             // 8. Normal Paragraphs
+             // Highlight bold parts inside the text
+             const parts = line.split(/(\*\*.*?\*\*)/g);
+             return (
+               <p key={i} className="text-[16px] leading-[1.75] tracking-tight text-slate-700 break-keep">
+                 {parts.map((part, idx) => {
+                   if (part.startsWith('**') && part.endsWith('**')) {
+                     return <strong key={idx} className="font-bold text-slate-900">{part.slice(2, -2)}</strong>;
+                   }
+                   return part;
+                 })}
+               </p>
+             );
           })}
         </div>
 
-        {/* Team Info Card */}
-        <div className="mt-16 p-6 border border-slate-200 rounded-xl bg-white shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
-          <h3 className="text-lg font-bold text-slate-900 mb-4">프로젝트 팀 소개</h3>
-          <div className="flex items-start gap-4">
-             <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-xl overflow-hidden border border-slate-100">
-                <img src="https://picsum.photos/100/100?random=10" alt="team" className="w-full h-full object-cover" />
-             </div>
-             <div>
-               <div className="flex items-center gap-2 mb-1">
-                  <span className="font-bold text-slate-900">{product.creator}</span>
-                  <span className="text-xs bg-teal-50 text-teal-600 px-2 py-0.5 rounded font-medium">진행한 프로젝트 0</span>
-               </div>
-               <p className="text-sm text-slate-500 mb-4">'책'에 관한 '걸'쭉하고 '상'큼한 이야기! YG와 JYP의 책걸상</p>
-               <div className="flex gap-4 text-sm text-slate-400">
-                  <span>팔로워 <b className="text-slate-700">0</b></span>
-                  <span>응원 <b className="text-slate-700">0</b></span>
-                  <span>후기 <b className="text-slate-700">0</b></span>
-               </div>
-             </div>
-          </div>
-        </div>
-
-        {/* Refund Policy */}
-        <div className="mt-10 p-6 bg-slate-50 rounded-xl border border-slate-200">
-          <h4 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
+        {/* Refund Policy Box */}
+        <div className="mt-16 bg-[#f9fafb] p-6 rounded-lg border border-slate-200">
+          <h4 className="font-bold text-slate-900 mb-3 text-[15px] flex items-center gap-2">
+            <svg className="w-4 h-4 text-[#00c7ae]" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" /></svg>
             환불 및 교환 정책
           </h4>
-          <div className="text-sm text-slate-600 whitespace-pre-line leading-relaxed">
+          <div className="text-[13px] text-slate-600 whitespace-pre-line leading-relaxed tracking-tight">
             {product.refundPolicy}
           </div>
         </div>
