@@ -1,0 +1,5 @@
+{
+  "name": "CrowdFund Goods",
+  "description": "A crowdfunding-style goods shop with Firebase integration and Admin management.",
+  "requestFramePermissions": []
+}
