@@ -17,18 +17,18 @@ export const ORDER_STATUS_LABELS: Record<string, string> = {
 
 // GitHub Raw Assets Base URL (Based on Firebase Project ID suggestion)
 // NOTE: If images do not appear, please verify the repository name "jyp-yg-fund" and branch "main".
-const ASSET_BASE_URL = "https://raw.githubusercontent.com/rlagkrrbs5860/jyp-yg-fund/main/assets";
+const ASSET_BASE_URL = "https://raw.githubusercontent.com/Mackgyun/JYP-YG-/main/assets/";
 
 export const PROJECT_IMAGES: Record<string, string> = {
-  logo: `${ASSET_BASE_URL}/logo.jpg`,
-  fourGrid: `${ASSET_BASE_URL}/4grid.png`,
-  sampleBook: `${ASSET_BASE_URL}/samplebook.jpg`,
-  ticket: `${ASSET_BASE_URL}/ticket.jpg`,
-  party: `${ASSET_BASE_URL}/party.jpg`,
-  yg: `${ASSET_BASE_URL}/yg.png`,
-  jyp: `${ASSET_BASE_URL}/jyp.jpg`,
-  ida: `${ASSET_BASE_URL}/ida.jpg`,
-  kim: `${ASSET_BASE_URL}/kim.jpg`,
+  logo: `${ASSET_BASE_URL}logo.jpg`, // 깔끔하게 연결됨
+  fourGrid: `${ASSET_BASE_URL}4grid.png`,
+  sampleBook: `${ASSET_BASE_URL}samplebook.jpg`,
+  ticket: `${ASSET_BASE_URL}ticket.jpg`,
+  party: `${ASSET_BASE_URL}party.jpg`,
+  yg: `${ASSET_BASE_URL}yg.png`,
+  jyp: `${ASSET_BASE_URL}jyp.jpg`,
+  ida: `${ASSET_BASE_URL}ida.jpg`,
+  kim: `${ASSET_BASE_URL}kim.jpg`,
 };
 
 export const MOCK_PRODUCT = {
