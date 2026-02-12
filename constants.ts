@@ -52,7 +52,7 @@ CAPTION: ※실물은 없으며 예시 이미지입니다.
 
 ### 뒤풀이
 
-IMAGE:https://images.unsplash.com/photo-1606787366850-de6330128bfc?q=80&w=1000&auto=format&fit=crop
+IMAGE:https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1000&auto=format&fit=crop
 CAPTION: *메뉴는 삼겹살입니다. (이미지는 연출된 컷입니다)
 
 ---
