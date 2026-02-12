@@ -14,25 +14,37 @@ const ProjectHero: React.FC<ProjectHeroProps> = ({ product }) => {
 
   return (
     <div className="w-full flex flex-col lg:flex-row gap-8 lg:gap-12 mb-10">
-      {/* Left: Image Grid (4-split) */}
+      {/* Left: Image Area */}
       <div className="w-full lg:w-[60%] flex-shrink-0">
-        <div className="grid grid-cols-2 grid-rows-2 gap-1 aspect-[4/3] rounded-xl overflow-hidden bg-slate-50">
-          {product.images.slice(0, 4).map((img, idx) => (
-            <div key={idx} className="relative w-full h-full group overflow-hidden">
-               <img 
-                 src={img} 
-                 alt={`Slide ${idx}`} 
-                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-               />
-            </div>
-          ))}
-          {/* Fill remaining slots if less than 4 images */}
-          {product.images.length < 4 && Array.from({ length: 4 - product.images.length }).map((_, idx) => (
-             <div key={`placeholder-${idx}`} className="bg-slate-200 w-full h-full flex items-center justify-center text-slate-400">
-                <span className="text-2xl">No Image</span>
-             </div>
-          ))}
-        </div>
+        {product.images.length === 1 ? (
+          // Single Image Layout (Full size)
+          <div className="aspect-[4/3] rounded-xl overflow-hidden bg-slate-50 border border-slate-100 shadow-sm">
+             <img 
+               src={product.images[0]} 
+               alt="Main Project Visual" 
+               className="w-full h-full object-cover"
+             />
+          </div>
+        ) : (
+          // Grid Layout (4-split)
+          <div className="grid grid-cols-2 grid-rows-2 gap-1 aspect-[4/3] rounded-xl overflow-hidden bg-slate-50">
+            {product.images.slice(0, 4).map((img, idx) => (
+              <div key={idx} className="relative w-full h-full group overflow-hidden">
+                 <img 
+                   src={img} 
+                   alt={`Slide ${idx}`} 
+                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                 />
+              </div>
+            ))}
+            {/* Fill remaining slots if less than 4 images */}
+            {product.images.length < 4 && Array.from({ length: 4 - product.images.length }).map((_, idx) => (
+               <div key={`placeholder-${idx}`} className="bg-slate-200 w-full h-full flex items-center justify-center text-slate-400">
+                  <span className="text-2xl">No Image</span>
+               </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Right: Project Info */}
