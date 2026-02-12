@@ -94,14 +94,18 @@ IMAGE_S:https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=200&
 펀딩 종료 후에는 즉시 제작 및 실행에 착수하는 프로젝트 특성상 단순 변심에 의한 후원금 환불이 불가능합니다.
 · 예상 전달일로부터 30일 이상 선물 전달이 이뤄지지 않을 경우, 환불을 원하시는 분들께는 수수료를 포함한 후원금을 환불해 드립니다.
 · 행사 참가권은 타인에게 양도가 가능합니다.`,
+  // 4 Images for the grid layout
   images: [
-    "https://images.unsplash.com/photo-1531545514256-b1400bc00f31?q=80&w=1600&auto=format&fit=crop", // Main 4-split feel (group of people)
+    "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=800&auto=format&fit=crop", // YG placeholder
+    "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=800&auto=format&fit=crop", // JYP placeholder
+    "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=800&auto=format&fit=crop", // Lee Da placeholder
+    "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=800&auto=format&fit=crop", // Kim Sae-seom placeholder
   ],
   rewards: [
     {
       id: 'reward_A',
       price: 60000,
-      title: '60,000원+',
+      title: '토크콘서트 입장권 + 기념품',
       description: '토크콘서트 입장권 + 기념품',
       remaining: 80,
       items: ['입장권', '기념품(공책)']
@@ -109,7 +113,7 @@ IMAGE_S:https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=200&
     {
       id: 'reward_B',
       price: 110000,
-      title: '110,000원+',
+      title: '토크콘서트 입장권 + 기념품 + 뒤풀이',
       description: '토크콘서트 입장권 + 기념품 + 뒤풀이',
       remaining: 80,
       items: ['입장권', '기념품(공책)', '뒤풀이 참가권']
@@ -117,7 +121,7 @@ IMAGE_S:https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=200&
     {
       id: 'reward_C',
       price: 50000,
-      title: '50,000원+',
+      title: '뒤풀이 + 기념품',
       description: '뒤풀이 + 기념품 (시즌 8 펀딩 토크콘서트 입장권 후원자용)',
       remaining: 40,
       items: ['뒤풀이 참가권', '기념품(공책)']

@@ -7,28 +7,7 @@ interface ProductDetailProps {
 
 const ProductDetail: React.FC<ProductDetailProps> = ({ product }) => {
   return (
-    <div className="w-full lg:w-[700px]">
-      {/* Main Image - Slightly smaller container as requested */}
-      <div className="w-full rounded-xl overflow-hidden bg-slate-100 mb-8 shadow-sm border border-slate-100">
-        <div className="aspect-[16/10] w-full relative">
-           <img 
-            src={product.images[0]} 
-            alt="Main Visual" 
-            className="w-full h-full object-cover"
-          />
-        </div>
-      </div>
-
-      {/* Tab Navigation - Removed sticky positioning */}
-      <div className="bg-white border-b border-slate-200 mb-10">
-        <div className="flex gap-6">
-          <button className="py-3 border-b-2 border-[#00c7ae] font-bold text-[#00c7ae] text-[15px]">프로젝트 소개</button>
-          <button className="py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-medium transition-colors text-[15px]">커뮤니티</button>
-          <button className="py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-medium transition-colors text-[15px]">후원자</button>
-        </div>
-      </div>
-
-      {/* Content */}
+    <div className="w-full">
       <div className="pb-12 text-slate-800">
         {/* Dynamic Parsing */}
         <div className="space-y-4">
