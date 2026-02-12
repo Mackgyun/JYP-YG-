@@ -1,18 +1,12 @@
 import React from 'react';
 import { Product } from '../types';
+import { PROJECT_IMAGES } from '../constants';
 
 interface ProductDetailProps {
   product: Product;
 }
 
 const ProductDetail: React.FC<ProductDetailProps> = ({ product }) => {
-  // Helper to ensure paths are absolute
-  const resolvePath = (path: string) => {
-    const trimmed = path.trim();
-    if (trimmed.startsWith('http') || trimmed.startsWith('data:')) return trimmed;
-    return trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
-  };
-
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     e.currentTarget.onerror = null;
     e.currentTarget.src = 'https://placehold.co/600x400/f1f5f9/94a3b8?text=Image+Not+Found';
@@ -52,26 +46,34 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product }) => {
 
              // 3. Images (Large - Content)
              if (trimmed.startsWith('IMAGE:')) {
+               const key = trimmed.replace('IMAGE:', '').trim();
+               const src = PROJECT_IMAGES[key];
+               if (!src) return null;
+
                return (
-                 <div key={i} className="my-5 lg:my-6 rounded-lg overflow-hidden border border-slate-100 bg-slate-50">
+                 <div key={i} className="my-5 lg:my-6 rounded-lg overflow-hidden">
                    <img 
-                     src={resolvePath(trimmed.replace('IMAGE:', ''))} 
+                     src={src} 
                      alt="Content" 
-                     className="w-full h-auto block" 
+                     className="w-full max-w-[500px] h-auto block mx-auto rounded-lg border border-slate-100 shadow-sm" 
                      onError={handleImageError}
                    />
                  </div>
                );
              }
 
-             // 4. Images (Profile/Team - Now Larger & Rectangular)
+             // 4. Images (Profile/Team - Now Larger)
              if (trimmed.startsWith('IMAGE_S:')) {
+               const key = trimmed.replace('IMAGE_S:', '').trim();
+               const src = PROJECT_IMAGES[key];
+               if (!src) return null;
+
                return (
                  <div key={i} className="my-3 lg:my-4">
                    <img 
-                     src={resolvePath(trimmed.replace('IMAGE_S:', ''))} 
+                     src={src} 
                      alt="Profile" 
-                     className="w-full max-w-[200px] lg:max-w-[240px] h-auto rounded-lg border border-slate-100 shadow-sm block object-cover" 
+                     className="w-full max-w-[320px] h-auto rounded-lg border border-slate-100 shadow-sm block object-cover" 
                      onError={handleProfileImageError}
                    />
                  </div>

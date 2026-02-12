@@ -18,6 +18,7 @@ import {
   updateDoc, 
   doc, 
   orderBy,
+  onSnapshot,
   Firestore,
   Timestamp
 } from "firebase/firestore";
@@ -183,7 +184,7 @@ export const createOrder = async (orderData: Omit<Order, 'id' | 'createdAt' | 's
   };
 
   if (isMockMode) {
-    mockOrders.push({ ...newOrder, id: `order_${Date.now()}` } as Order);
+    mockOrders.push({ ...newOrder, id: `order_${Date.now()}`, rewardItems: orderData.rewardItems || [] } as Order);
     return true;
   }
 
@@ -196,7 +197,7 @@ export const createOrder = async (orderData: Omit<Order, 'id' | 'createdAt' | 's
     // If DB write fails (e.g. permission denied), fallback to mock
     console.warn("Falling back to local mock storage due to DB error.");
     isMockMode = true;
-    mockOrders.push({ ...newOrder, id: `order_${Date.now()}` } as Order);
+    mockOrders.push({ ...newOrder, id: `order_${Date.now()}`, rewardItems: orderData.rewardItems || [] } as Order);
     return true;
   }
 };
@@ -217,9 +218,6 @@ export const fetchOrders = async (currentUserEmail: string, isAdmin: boolean): P
     if (isAdmin) {
       q = query(ordersRef, orderBy("createdAt", "desc"));
     } else {
-      // NOTE: Using `where` and `orderBy` together on different fields requires a Composite Index in Firestore.
-      // If the index is missing, the query fails and throws an error (which is caught below, resulting in empty data).
-      // To fix this without manually creating an index, we remove the `orderBy` from the query and sort in memory.
       q = query(ordersRef, where("userEmail", "==", currentUserEmail));
     }
 
@@ -229,7 +227,7 @@ export const fetchOrders = async (currentUserEmail: string, isAdmin: boolean): P
       orders.push({ id: doc.id, ...(doc.data() as any) } as Order);
     });
 
-    // Client-side sorting
+    // Client-side sorting for non-admin queries if composite index is missing
     orders.sort((a, b) => b.createdAt - a.createdAt);
 
     return orders;
@@ -240,6 +238,48 @@ export const fetchOrders = async (currentUserEmail: string, isAdmin: boolean): P
     return isAdmin 
       ? [...mockOrders] 
       : mockOrders.filter(o => o.userEmail === currentUserEmail);
+  }
+};
+
+// REAL-TIME SUBSCRIPTION
+export const subscribeToOrders = (currentUserEmail: string, isAdmin: boolean, callback: (orders: Order[]) => void) => {
+  if (isMockMode) {
+    // In mock mode, just return current state once. Real-time updates in mock mode aren't supported without more complex logic.
+    const orders = isAdmin 
+      ? [...mockOrders] 
+      : mockOrders.filter(o => o.userEmail === currentUserEmail);
+    callback(orders.sort((a, b) => b.createdAt - a.createdAt));
+    return () => {};
+  }
+
+  if (!db) return () => {};
+
+  try {
+    const ordersRef = collection(db, "orders");
+    let q;
+
+    if (isAdmin) {
+      q = query(ordersRef, orderBy("createdAt", "desc"));
+    } else {
+      q = query(ordersRef, where("userEmail", "==", currentUserEmail));
+    }
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const orders: Order[] = [];
+      querySnapshot.forEach((doc) => {
+        orders.push({ id: doc.id, ...(doc.data() as any) } as Order);
+      });
+      // Sort client-side to be safe
+      orders.sort((a, b) => b.createdAt - a.createdAt);
+      callback(orders);
+    }, (error) => {
+      console.error("Error subscribing to orders:", error);
+    });
+
+    return unsubscribe;
+  } catch (e) {
+    console.error("Error setting up subscription:", e);
+    return () => {};
   }
 };
 
@@ -276,9 +316,6 @@ export const fetchProjectStats = async (): Promise<{ currentAmount: number; supp
   if (!db) return { currentAmount: 0, supporterCount: 0 };
 
   try {
-    // Ideally, this should be an aggregation query or a separate stats document updated by Cloud Functions.
-    // For this simple app, we'll fetch all orders to sum them up. 
-    // Optimization: Only select needed fields if possible, but Firestore client SDK doesn't support 'select' fields well without extensions.
     const ordersRef = collection(db, "orders");
     const querySnapshot = await getDocs(ordersRef);
     
@@ -287,7 +324,8 @@ export const fetchProjectStats = async (): Promise<{ currentAmount: number; supp
     
     querySnapshot.forEach((doc) => {
       const data = doc.data();
-      // Only count if it has an amount
+      // NOTE: We sum up ALL orders (Pending + Paid) to show "Pledged Amount", which is standard for crowdfunding.
+      // If you only want 'paid', add a check for data.status === 'paid'
       if (data.totalAmount) {
         total += data.totalAmount;
         count++;

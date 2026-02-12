@@ -22,7 +22,8 @@ export interface Order {
   status: OrderStatus;
   createdAt: number;
   productName: string;
-  rewardTitle: string; // Track which reward was chosen
+  rewardTitle: string;
+  rewardItems: string[]; // Track the specific items
   totalAmount: number;
 }
 

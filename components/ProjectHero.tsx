@@ -1,28 +1,23 @@
 import React from 'react';
 import { Product } from '../types';
+import { PROJECT_IMAGES } from '../constants';
 
 interface ProjectHeroProps {
   product: Product;
 }
 
 const ProjectHero: React.FC<ProjectHeroProps> = ({ product }) => {
+  // Use URL string from constants
+  const heroImages = [PROJECT_IMAGES.fourGrid];
+
   const progress = Math.min((product.currentAmount / product.goalAmount) * 100, 100);
   const today = new Date();
   const endDate = new Date(product.endDate);
   const diffTime = Math.abs(endDate.getTime() - today.getTime());
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-  // Helper to ensure paths are absolute (start with /) for public folder assets
-  const resolvePath = (path: string) => {
-    const trimmed = path.trim();
-    if (trimmed.startsWith('http') || trimmed.startsWith('data:')) return trimmed;
-    // If it doesn't start with /, add it.
-    return trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
-  };
-
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     e.currentTarget.onerror = null; // Prevent infinite loop
-    // Fallback placeholder service
     e.currentTarget.src = 'https://placehold.co/800x600/f1f5f9/94a3b8?text=Image+Not+Found';
     e.currentTarget.alt = '이미지를 불러올 수 없습니다';
   };
@@ -31,49 +26,29 @@ const ProjectHero: React.FC<ProjectHeroProps> = ({ product }) => {
     <div className="w-full flex flex-col lg:flex-row gap-6 lg:gap-12 mb-6 lg:mb-10">
       {/* Left: Image Area */}
       <div className="w-full lg:w-[60%] flex-shrink-0">
-        {/* Mobile: Always show single main image (First one) */}
+        {/* Mobile: Always show single main image */}
         <div className="block lg:hidden aspect-video rounded-xl overflow-hidden bg-slate-50 border border-slate-100 shadow-sm relative">
              <img 
-               src={resolvePath(product.images[0])} 
+               src={heroImages[0]} 
                alt="Main Project Visual" 
                className="w-full h-full object-cover"
                onError={handleImageError}
              />
              <div className="absolute bottom-3 right-3 bg-black/50 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
-               1 / {product.images.length}
+               1 / {heroImages.length}
              </div>
         </div>
 
         {/* Desktop: Grid or Full Layout */}
         <div className="hidden lg:block w-full h-full">
-          {product.images.length === 1 ? (
-            <div className="aspect-[4/3] rounded-xl overflow-hidden bg-slate-50 border border-slate-100 shadow-sm relative group">
-               <img 
-                 src={resolvePath(product.images[0])} 
-                 alt="Main Project Visual" 
-                 className="w-full h-full object-cover"
-                 onError={handleImageError}
-               />
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 grid-rows-2 gap-1 aspect-[4/3] rounded-xl overflow-hidden bg-slate-50">
-              {product.images.slice(0, 4).map((img, idx) => (
-                <div key={idx} className="relative w-full h-full group overflow-hidden">
-                   <img 
-                     src={resolvePath(img)} 
-                     alt={`Slide ${idx}`} 
-                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                     onError={handleImageError}
-                   />
-                </div>
-              ))}
-              {product.images.length < 4 && Array.from({ length: 4 - product.images.length }).map((_, idx) => (
-                 <div key={`placeholder-${idx}`} className="bg-slate-200 w-full h-full flex items-center justify-center text-slate-400">
-                    <span className="text-2xl">No Image</span>
-                 </div>
-              ))}
-            </div>
-          )}
+          <div className="aspect-[4/3] rounded-xl overflow-hidden bg-slate-50 border border-slate-100 shadow-sm relative group p-8 flex items-center justify-center">
+              <img 
+                src={heroImages[0]} 
+                alt="Main Project Visual" 
+                className="w-full h-full object-contain shadow-sm rounded-lg"
+                onError={handleImageError}
+              />
+          </div>
         </div>
       </div>
 

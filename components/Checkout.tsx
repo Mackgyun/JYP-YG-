@@ -71,6 +71,7 @@ const Checkout: React.FC<CheckoutProps> = ({ user, product, reward, onCancel, on
       address: formData.address || '현장수령',
       productName: product.title,
       rewardTitle: reward.title,
+      rewardItems: reward.items, // Include specific items
       totalAmount: reward.price,
       quantity: 1 
     };
@@ -104,6 +105,11 @@ const Checkout: React.FC<CheckoutProps> = ({ user, product, reward, onCancel, on
             <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
               <p className="font-bold text-slate-800 mb-1">{product.title}</p>
               <p className="text-sm text-slate-600 mb-2">{reward.title}</p>
+              <div className="text-xs text-slate-500 mb-3 pl-2 border-l-2 border-slate-200">
+                 {reward.items.map((item, idx) => (
+                   <span key={idx} className="block">• {item}</span>
+                 ))}
+              </div>
               <p className="text-right font-bold text-[#00c7ae]">{reward.price.toLocaleString()}원</p>
             </div>
           </div>

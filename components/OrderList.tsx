@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Order, UserProfile, OrderStatus } from '../types';
-import { fetchOrders, updateOrderStatus } from '../services/firebase';
+import { subscribeToOrders, updateOrderStatus } from '../services/firebase';
 import { ADMIN_EMAIL, ORDER_STATUS_LABELS } from '../constants';
 
 interface OrderListProps {
@@ -14,24 +14,25 @@ const OrderList: React.FC<OrderListProps> = ({ user }) => {
   // Use the constant strictly for admin check
   const isAdmin = user.email === ADMIN_EMAIL;
 
-  const loadOrders = async () => {
-    setLoading(true);
-    const data = await fetchOrders(user.email || '', isAdmin);
-    setOrders(data);
-    setLoading(false);
-  };
-
   useEffect(() => {
-    loadOrders();
-  }, [user]);
+    setLoading(true);
+    // Subscribe to real-time updates
+    const unsubscribe = subscribeToOrders(user.email || '', isAdmin, (data) => {
+      setOrders(data);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [user, isAdmin]);
 
   const handleStatusChange = async (orderId: string, newStatus: OrderStatus) => {
+    // Optimistic update
     setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
     
     const success = await updateOrderStatus(orderId, newStatus);
     if (!success) {
       alert("상태 변경 실패");
-      loadOrders(); 
+      // Revert is handled by the subscription usually, but we could force reload if needed
     }
   };
 
@@ -65,7 +66,7 @@ const OrderList: React.FC<OrderListProps> = ({ user }) => {
         <h3 className="text-lg font-bold text-slate-900">
           {isAdmin ? '전체 주문 관리 (관리자)' : '나의 참여 내역'}
         </h3>
-        <button onClick={loadOrders} className="text-sm text-orange-600 hover:text-orange-700 font-medium">새로고침</button>
+        {/* With real-time listener, manual refresh is less critical but kept as fallback */}
       </div>
 
       <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
@@ -77,9 +78,17 @@ const OrderList: React.FC<OrderListProps> = ({ user }) => {
                  <p className="text-xs text-slate-400 mb-1">{order.productName}</p>
                  
                  {/* Reward Title (Main, Bold) */}
-                 <p className="font-bold text-slate-800 text-base leading-snug mb-2">
+                 <p className="font-bold text-slate-800 text-base leading-snug mb-1">
                    {order.rewardTitle}
                  </p>
+
+                 {/* Display Reward Items */}
+                 {order.rewardItems && order.rewardItems.length > 0 && (
+                   <div className="text-xs text-slate-600 bg-slate-50 px-2 py-1.5 rounded mb-2 inline-block">
+                     <span className="font-bold text-slate-700 mr-1">구성:</span> 
+                     {order.rewardItems.join(', ')}
+                   </div>
+                 )}
 
                  <div className="text-sm text-slate-500 space-y-0.5">
                    <p className="text-xs">수량: {order.quantity}개 | {new Date(order.createdAt).toLocaleDateString()}</p>
