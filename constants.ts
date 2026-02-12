@@ -1,6 +1,12 @@
-
 export const APP_NAME = "OHMYCOMPANY";
-export const ADMIN_EMAIL = "admin@gmail.com";
+export const ADMIN_EMAIL = "rlagkrrbs5860@gmail.com";
+
+// Bank Account Information for Transfer
+export const BANK_INFO = {
+  bankName: "신한은행",
+  accountNumber: "110-123-456789",
+  holder: "주식회사 청년의사"
+};
 
 export const ORDER_STATUS_LABELS: Record<string, string> = {
   pending_payment: '입금 확인 중',
@@ -97,10 +103,7 @@ IMAGE_S:/김새섬.jpg
 · 행사 참가권은 타인에게 양도가 가능합니다.`,
   // Main Hero Image
   images: [
-    "/4분할.png",
-    "/샘플북.jpg",
-    "/입장권.jpg",
-    "/뒷풀이.jpg"
+    "/4분할.png" 
   ],
   rewards: [
     {

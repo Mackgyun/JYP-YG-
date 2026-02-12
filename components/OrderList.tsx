@@ -11,7 +11,8 @@ const OrderList: React.FC<OrderListProps> = ({ user }) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   
-  const isAdmin = user.email === ADMIN_EMAIL || user.email === 'admin@gmail.com';
+  // Use the constant strictly for admin check
+  const isAdmin = user.email === ADMIN_EMAIL;
 
   const loadOrders = async () => {
     setLoading(true);
@@ -70,17 +71,24 @@ const OrderList: React.FC<OrderListProps> = ({ user }) => {
       <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
         {orders.map((order) => (
           <div key={order.id} className="bg-white border border-slate-200 rounded-lg p-5 hover:border-orange-200 transition-colors">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="font-bold text-slate-800 text-base mb-1">{order.productName}</p>
-                <div className="text-sm text-slate-500 space-y-0.5">
-                   <p>수량: {order.quantity}개 | {new Date(order.createdAt).toLocaleDateString()}</p>
-                   <p>받는 분: {order.contactName} ({order.contactPhone})</p>
+            <div className="flex justify-between items-start mb-3">
+              <div className="flex-1 pr-4">
+                 {/* Product Name (Small) */}
+                 <p className="text-xs text-slate-400 mb-1">{order.productName}</p>
+                 
+                 {/* Reward Title (Main, Bold) */}
+                 <p className="font-bold text-slate-800 text-base leading-snug mb-2">
+                   {order.rewardTitle}
+                 </p>
+
+                 <div className="text-sm text-slate-500 space-y-0.5">
+                   <p className="text-xs">수량: {order.quantity}개 | {new Date(order.createdAt).toLocaleDateString()}</p>
+                   <p className="text-xs">받는 분: {order.contactName} ({order.contactPhone})</p>
                 </div>
                 {isAdmin && <p className="text-xs text-indigo-600 mt-1 font-mono">{order.userEmail}</p>}
               </div>
               
-              <div className="flex flex-col items-end gap-2 min-w-[100px]">
+              <div className="flex flex-col items-end gap-2 min-w-[90px]">
                 {isAdmin ? (
                   <select 
                     value={order.status}
@@ -92,16 +100,23 @@ const OrderList: React.FC<OrderListProps> = ({ user }) => {
                     ))}
                   </select>
                 ) : (
-                  <span className={`px-2.5 py-1 rounded border text-xs font-bold ${getStatusColor(order.status)}`}>
+                  <span className={`px-2.5 py-1 rounded border text-xs font-bold whitespace-nowrap ${getStatusColor(order.status)}`}>
                     {ORDER_STATUS_LABELS[order.status] || order.status}
                   </span>
                 )}
               </div>
             </div>
             
-            <div className="mt-4 pt-3 border-t border-slate-100 bg-slate-50 -mx-5 -mb-5 px-5 py-3 rounded-b-lg">
-              <span className="font-bold text-xs text-slate-500 uppercase tracking-wider mr-2">배송지</span>
-              <span className="text-sm text-slate-700">{order.address}</span>
+            {/* Payment Amount & Address */}
+            <div className="mt-3 pt-3 border-t border-slate-100 bg-slate-50 -mx-5 -mb-5 px-5 py-3 rounded-b-lg flex justify-between items-center">
+              <div className="flex flex-col">
+                 <span className="font-bold text-xs text-slate-500 uppercase tracking-wider mb-0.5">결제 금액</span>
+                 <span className="font-bold text-slate-900">{order.totalAmount?.toLocaleString()}원</span>
+              </div>
+              <div className="flex flex-col items-end text-right max-w-[50%]">
+                 <span className="font-bold text-xs text-slate-500 uppercase tracking-wider mb-0.5">배송지</span>
+                 <span className="text-xs text-slate-700 truncate w-full">{order.address}</span>
+              </div>
             </div>
           </div>
         ))}
